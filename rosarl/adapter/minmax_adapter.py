@@ -1,33 +1,18 @@
-# Copyright 2023 OmniSafe Team. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-"""OnPolicy Adapter for OmniSafe."""
+"""Minmax Adapter for OmniSafe."""
 
 from __future__ import annotations
 
 from typing import Any
 
 import torch
-from rich.progress import track
+from omnisafe.adapter import OnPolicyAdapter
 
 # from omnisafe.adapter.online_adapter import OnlineAdapter
 from omnisafe.common.buffer import VectorOnPolicyBuffer
 from omnisafe.common.logger import Logger
 from omnisafe.models.actor_critic.constraint_actor_critic import ConstraintActorCritic
 from omnisafe.utils.config import Config
-
-from omnisafe.adapter import OnPolicyAdapter
+from rich.progress import track
 
 
 class MinmaxAdapter(OnPolicyAdapter):
@@ -151,60 +136,6 @@ class MinmaxAdapter(OnPolicyAdapter):
         logger.store({"Penalty/Minmax": self._minmax_penalty.penalty})
         return reward
 
-    # def _log_value(
-    #     self,
-    #     reward: torch.Tensor,
-    #     cost: torch.Tensor,
-    #     info: dict[str, Any],
-    # ) -> None:
-    #     """Log value.
-
-    #     .. note::
-    #         OmniSafe uses :class:`RewardNormalizer` wrapper, so the original reward and cost will
-    #         be stored in ``info['original_reward']`` and ``info['original_cost']``.
-
-    #     Args:
-    #         reward (torch.Tensor): The immediate step reward.
-    #         cost (torch.Tensor): The immediate step cost.
-    #         info (dict[str, Any]): Some information logged by the environment.
-    #     """
-    #     self._ep_ret += info.get("original_reward", reward).cpu()
-    #     self._ep_cost += info.get("original_cost", cost).cpu()
-    #     self._ep_len += 1
-
-    # def _log_metrics(self, logger: Logger, idx: int) -> None:
-    #     """Log metrics, including ``EpRet``, ``EpCost``, ``EpLen``.
-
-    #     Args:
-    #         logger (Logger): Logger, to log ``EpRet``, ``EpCost``, ``EpLen``.
-    #         idx (int): The index of the environment.
-    #     """
-    #     if hasattr(self._env, "spec_log"):
-    #         self._env.spec_log(logger)
-    #     logger.store(
-    #         {
-    #             "Metrics/EpRet": self._ep_ret[idx],
-    #             "Metrics/EpCost": self._ep_cost[idx],
-    #             "Metrics/EpLen": self._ep_len[idx],
-    #         },
-    #     )
-
-    # def _reset_log(self, idx: int | None = None) -> None:
-    #     """Reset the episode return, episode cost and episode length.
-
-    #     Args:
-    #         idx (int or None, optional): The index of the environment. Defaults to None
-    #             (single environment).
-    #     """
-    #     if idx is None:
-    #         self._ep_ret = torch.zeros(self._env.num_envs)
-    #         self._ep_cost = torch.zeros(self._env.num_envs)
-    #         self._ep_len = torch.zeros(self._env.num_envs)
-    #     else:
-    #         self._ep_ret[idx] = 0.0
-    #         self._ep_cost[idx] = 0.0
-    #         self._ep_len[idx] = 0.0
-
 
 class MinMaxPenalty:
     """
@@ -225,7 +156,12 @@ class MinMaxPenalty:
                 reward = penalty
     """
 
-    def __init__(self, device: str = "cpu", r_min: torch.Tensor = None, r_max: torch.Tensor = None):
+    def __init__(
+        self,
+        device: str = "cpu",
+        r_min: torch.Tensor = None,
+        r_max: torch.Tensor = None,
+    ):
         self.r_min = torch.tensor([0.0], device=device) if r_min is None else r_min
         self.r_max = torch.tensor([0.0], device=device) if r_max is None else r_max
         self.v_min = self.r_min
