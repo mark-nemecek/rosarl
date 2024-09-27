@@ -40,6 +40,12 @@ if __name__ == "__main__":
         help="total number of steps to train for algorithm",
     )
     parser.add_argument(
+        "--layer-size",
+        type=int,
+        default=0,
+        help="size of the hidden layers",
+    )
+    parser.add_argument(
         "--device",
         type=str,
         default="cpu",
@@ -69,11 +75,22 @@ if __name__ == "__main__":
     for k, v in unparsed_args.items():
         update_dict(custom_cfgs, custom_cfgs_to_dict(k, v))
 
-    agent = omnisafe.Agent(
+    if args.layer_size > 0:
+        hidden_sizes = {
+            "model_cfgs": {
+                "actor": {"hidden_sizes": [args.layer_size, args.layer_size]},
+                "critic": {"hidden_sizes": [args.layer_size, args.layer_size]},
+            }
+        }
+        update_dict(custom_cfgs, hidden_sizes)
+
+    args_cfgs = vars(args)
+    args_cfgs.pop("layer_size")
+
     agent = rosarl.Agent(
         args.algo,
         args.env_id,
-        train_terminal_cfgs=vars(args),
+        train_terminal_cfgs=args_cfgs,
         custom_cfgs=custom_cfgs,
     )
     agent.learn()
