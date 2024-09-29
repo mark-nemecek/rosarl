@@ -1,7 +1,6 @@
 """Implementation of the Minmax version of the TRPO algorithm."""
 
 import torch
-
 from omnisafe.algorithms import registry
 from omnisafe.algorithms.on_policy.base.trpo import TRPO
 from omnisafe.utils import distributed
@@ -22,11 +21,13 @@ class TRPOMinmax(TRPO):
         +----------------------------+--------------------------+
         | Things to log              | Description              |
         +============================+==========================+
-        | Penalty/Minmax             | The Minmax penalty.      |
+        | Misc/MinmaxPenalty         | The Minmax penalty.      |
+        | Metrics/CumulativeCost     | The cumulative cost.     |
         +----------------------------+--------------------------+
         """
         super()._init_log()
-        self._logger.register_key('Penalty/Minmax')
+        self._logger.register_key("Misc/MinmaxPenalty")
+        self._logger.register_key("Metrics/CumulativeCost")
 
     def _init_env(self) -> None:
         """Initialize the environment.
@@ -46,7 +47,7 @@ class TRPOMinmax(TRPO):
         )
         assert (self._cfgs.algo_cfgs.steps_per_epoch) % (
             distributed.world_size() * self._cfgs.train_cfgs.vector_env_nums
-        ) == 0, 'The number of steps per epoch is not divisible by the number of environments.'
+        ) == 0, "The number of steps per epoch is not divisible by the number of environments."
         self._steps_per_epoch: int = (
             self._cfgs.algo_cfgs.steps_per_epoch
             // distributed.world_size()
