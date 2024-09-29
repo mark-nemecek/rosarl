@@ -169,7 +169,11 @@ class MinMaxPenalty:
         self.penalty = min(self.r_min, (self.v_min - self.v_max))
         try:
             self.minmax_update = torch.compile(minmax_update)
-        except:
+            # test compile in case GPU doesn't support it
+            self.minmax_update(
+                self.r_min, self.r_max, self.v_min, self.v_max, self.r_min, self.r_min
+            )
+        except RuntimeError:
             self.minmax_update = minmax_update
 
     def update(self, reward: torch.Tensor, value: torch.Tensor):
