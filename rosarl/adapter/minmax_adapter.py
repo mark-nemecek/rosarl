@@ -166,15 +166,33 @@ class MinMaxPenalty:
         self.r_max = torch.tensor([0.0], device=device) if r_max is None else r_max
         self.v_min = self.r_min
         self.v_max = self.r_max
-        self.update_penalty()
+        self.penalty = min(self.r_min, (self.v_min - self.v_max))
+        try:
+            self.minmax_update = torch.compile(minmax_update)
+        except:
+            self.minmax_update = minmax_update
 
     def update(self, reward: torch.Tensor, value: torch.Tensor):
-        self.r_min = min(self.r_min, reward)
-        self.r_max = max(self.r_max, reward)
-        self.v_min = min(self.v_min, self.r_min, value.min().unsqueeze(0))
-        self.v_max = max(self.v_max, self.r_max, value.max().unsqueeze(0))
+        self.r_min, self.r_max, self.v_min, self.v_max, self.penalty = (
+            self.minmax_update(
+                self.r_min, self.r_max, self.v_min, self.v_max, reward, value
+            )
+        )
 
-        self.update_penalty()
 
-    def update_penalty(self):
-        self.penalty = min(self.r_min, (self.v_min - self.v_max))
+def minmax_update(
+    r_min: torch.Tensor,
+    r_max: torch.Tensor,
+    v_min: torch.Tensor,
+    v_max: torch.Tensor,
+    reward: torch.Tensor,
+    value: torch.Tensor,
+):
+    new_r_min = min(r_min, reward)
+    new_r_max = max(r_max, reward)
+    new_v_min = min(v_min, new_r_min, value.min().unsqueeze(0))
+    new_v_max = max(v_max, new_r_max, value.max().unsqueeze(0))
+
+    penalty = min(new_r_min, (new_v_min - new_v_max))
+
+    return new_r_min, new_r_max, new_v_min, new_v_max, penalty
