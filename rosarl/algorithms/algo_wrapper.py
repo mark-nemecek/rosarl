@@ -79,7 +79,7 @@ class CustomAlgoWrapper(AlgoWrapper):
                     self.train_terminal_cfgs['parallel'] == 1
                 ), 'off-policy, model-based and offline only support parallel==1!'
 
-        if self.algo in ["TRPOMinmax"]:
+        if self.algo in ["TRPOMinmax", "PPOMinmax"]:
             cfgs = rosarl_get_default_kwargs_yaml(self.algo, self.env_id, self.algo_type)
         else:
             cfgs = get_default_kwargs_yaml(self.algo, self.env_id, self.algo_type)
