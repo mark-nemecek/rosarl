@@ -85,11 +85,11 @@ defaults:
   # logger configurations
   logger_cfgs:
     # use wandb for logging
-    use_wandb: True
+    use_wandb: False
     # wandb project name
     wandb_project: rosarl
     # use tensorboard for logging
-    use_tensorboard: False
+    use_tensorboard: True
     # save model frequency
     save_model_freq: 100
     # save logger path
