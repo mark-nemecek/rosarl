@@ -14,14 +14,29 @@ def patch_PolicyGradient():
             "Metrics/EpSuccess",
             window_length=self._cfgs.logger_cfgs.window_lens,
         )
+        self._logger.register_key(
+            "Metrics/CumulativeCost",
+            window_length=1,
+        )
 
     PolicyGradient._init_log = _init_log
 
 
 def patch_OnPolicyAdapter():
+    original___init__ = OnPolicyAdapter.__init__
     original__log_value = OnPolicyAdapter._log_value
     original__log_metrics = OnPolicyAdapter._log_metrics
     original__reset_log = OnPolicyAdapter._reset_log
+
+    def __init__(
+        self,
+        env_id: str,
+        num_envs: int,
+        seed: int,
+        cfgs,
+    ) -> None:
+        original___init__(self, env_id, num_envs, seed, cfgs)
+        self._cumulative_cost = torch.tensor(0.0, device=self._device)
 
     def _log_value(
         self,
@@ -36,10 +51,16 @@ def patch_OnPolicyAdapter():
             else info.get("success", False)
         )
         self._ep_success += success
+        self._cumulative_cost += cost.sum()
 
     def _log_metrics(self, logger, idx: int) -> None:
         original__log_metrics(self, logger, idx)
-        logger.store({"Metrics/EpSuccess": self._ep_success[idx]})
+        logger.store(
+            {
+                "Metrics/EpSuccess": self._ep_success[idx],
+                "Metrics/CumulativeCost": self._cumulative_cost,
+            }
+        )
 
     def _reset_log(self, idx: int | None = None) -> None:
         original__reset_log(self, idx)
@@ -48,6 +69,7 @@ def patch_OnPolicyAdapter():
         else:
             self._ep_success[idx] = 0
 
+    OnPolicyAdapter.__init__ = __init__
     OnPolicyAdapter._log_value = _log_value
     OnPolicyAdapter._log_metrics = _log_metrics
     OnPolicyAdapter._reset_log = _reset_log

@@ -16,7 +16,6 @@ class MinmaxMixin:
         """
         super()._init_log()
         self._logger.register_key("Misc/MinmaxPenalty")
-        self._logger.register_key("Metrics/CumulativeCost")
 
     def _init_env(self) -> None:
         """Initialize the environment.

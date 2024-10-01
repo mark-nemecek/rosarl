@@ -39,8 +39,7 @@ class MinmaxAdapter(OnPolicyAdapter):
         """Initialize an instance of :class:`MinmaxAdapter`."""
         super().__init__(env_id, num_envs, seed, cfgs)
 
-        self._minmax_penalty = MinMaxPenalty(cfgs["train_cfgs"]["device"])
-        self._cumulative_cost = torch.zeros((1,), device=cfgs["train_cfgs"]["device"])
+        self._minmax_penalty = MinMaxPenalty(self._device)
 
     def rollout(  # pylint: disable=too-many-locals
         self,
@@ -73,7 +72,6 @@ class MinmaxAdapter(OnPolicyAdapter):
             next_obs, reward, cost, terminated, truncated, info = self.step(act)
 
             self._log_value(reward=reward, cost=cost, info=info)
-            self._cumulative_cost += cost
 
             reward = self._penalize_reward(logger, reward, value_r, info)
 
@@ -103,7 +101,6 @@ class MinmaxAdapter(OnPolicyAdapter):
 
                 # Only store the cumulative cost and minmax penalty for logging at the end of the epoch
                 logger.store({"Misc/MinmaxPenalty": self._minmax_penalty.penalty})
-                logger.store({"Metrics/CumulativeCost": self._cumulative_cost})
 
             for idx, (done, time_out) in enumerate(zip(terminated, truncated)):
                 if epoch_end or done or time_out:
