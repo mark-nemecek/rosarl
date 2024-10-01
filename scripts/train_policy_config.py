@@ -1,6 +1,7 @@
 import argparse
 
 import yaml
+from monkeypatch import monkeypatch
 from omnisafe.utils.tools import custom_cfgs_to_dict, update_dict
 
 import rosarl
@@ -21,6 +22,8 @@ def load_config(config_path: str):
 
 
 if __name__ == "__main__":
+    monkeypatch()
+
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
@@ -75,7 +78,7 @@ if __name__ == "__main__":
     if "defaults" in file_cfgs:
         custom_cfgs = file_cfgs["defaults"]
         # if args.env_id in file_cfgs:
-            # update_dict(custom_cfgs, file_cfgs[args.env_id])
+        # update_dict(custom_cfgs, file_cfgs[args.env_id])
     else:
         custom_cfgs = file_cfgs
 

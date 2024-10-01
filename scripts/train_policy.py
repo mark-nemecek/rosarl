@@ -1,5 +1,6 @@
 import argparse
 
+from monkeypatch import monkeypatch
 from omnisafe.utils.tools import custom_cfgs_to_dict, update_dict
 
 import rosarl
@@ -7,6 +8,8 @@ import rosarl.algorithms
 import rosarl.envs
 
 if __name__ == "__main__":
+    monkeypatch()
+
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
