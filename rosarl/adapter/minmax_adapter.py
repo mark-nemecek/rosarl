@@ -1,63 +1,14 @@
-"""Minmax Adapter for OmniSafe."""
+from __future__ import annotations
 
 from typing import Any
 
 import torch
 from omnisafe.adapter import OnPolicyAdapter
-
-# from omnisafe.adapter.online_adapter import OnlineAdapter
 from omnisafe.common.buffer import VectorOnPolicyBuffer
 from omnisafe.common.logger import Logger
 from omnisafe.models.actor_critic.constraint_actor_critic import ConstraintActorCritic
 from omnisafe.utils.config import Config
 from rich.progress import track
-
-
-class MinMaxPenalty:
-    """
-    Learn the highest reward/penalty that minimises the probability of reaching bad terminal states
-    Arguments:
-        - rmin (optional) (torch.Tensor): The lower bound for environment rewards
-        - rmax (optional) (torch.Tensor): The upper bound for environment rewards
-    Return:
-        - The minmax penalty estimate
-    Usage:
-    Symlink to the desired folder and import, or copy-paste to where needed
-    In training loop:
-        minmaxpenalty = MinMaxPenalty()
-        for each step:
-            - take an action and get reward and q_value (or just [value] if using policy gradient)
-            penalty = minmaxpenalty.update(reward, Q[state])
-            if info["unsafe"]:
-                reward = penalty
-    """
-
-    def __init__(
-        self,
-        device: str = "cpu",
-        r_min: torch.Tensor = None,
-        r_max: torch.Tensor = None,
-    ):
-        self.r_min = torch.tensor([0.0], device=device) if r_min is None else r_min
-        self.r_max = torch.tensor([0.0], device=device) if r_max is None else r_max
-        self.v_min = self.r_min
-        self.v_max = self.r_max
-        self.penalty = min(self.r_min, (self.v_min - self.v_max))
-        try:
-            self.minmax_update = torch.compile(minmax_update)
-            # test compile in case GPU doesn't support it
-            self.minmax_update(
-                self.r_min, self.r_max, self.v_min, self.v_max, self.r_min, self.r_min
-            )
-        except RuntimeError:
-            self.minmax_update = minmax_update
-
-    def update(self, reward: torch.Tensor, value: torch.Tensor):
-        self.r_min, self.r_max, self.v_min, self.v_max, self.penalty = (
-            self.minmax_update(
-                self.r_min, self.r_max, self.v_min, self.v_max, reward, value
-            )
-        )
 
 
 class MinmaxAdapter(OnPolicyAdapter):
@@ -199,6 +150,53 @@ class MinmaxAdapter(OnPolicyAdapter):
     def _log_metrics(self, logger: Logger, idx: int) -> None:
         logger.store({"Misc/MinmaxPenalty": self._minmax_penalty.penalty})
         return super()._log_metrics(logger, idx)
+
+
+class MinMaxPenalty:
+    """
+    Learn the highest reward/penalty that minimises the probability of reaching bad terminal states
+    Arguments:
+        - rmin (optional) (torch.Tensor): The lower bound for environment rewards
+        - rmax (optional) (torch.Tensor): The upper bound for environment rewards
+    Return:
+        - The minmax penalty estimate
+    Usage:
+    Symlink to the desired folder and import, or copy-paste to where needed
+    In training loop:
+        minmaxpenalty = MinMaxPenalty()
+        for each step:
+            - take an action and get reward and q_value (or just [value] if using policy gradient)
+            penalty = minmaxpenalty.update(reward, Q[state])
+            if info["unsafe"]:
+                reward = penalty
+    """
+
+    def __init__(
+        self,
+        device: str = "cpu",
+        r_min: torch.Tensor = None,
+        r_max: torch.Tensor = None,
+    ):
+        self.r_min = torch.tensor([0.0], device=device) if r_min is None else r_min
+        self.r_max = torch.tensor([0.0], device=device) if r_max is None else r_max
+        self.v_min = self.r_min
+        self.v_max = self.r_max
+        self.penalty = min(self.r_min, (self.v_min - self.v_max))
+        try:
+            self.minmax_update = torch.compile(minmax_update)
+            # test compile in case GPU doesn't support it
+            self.minmax_update(
+                self.r_min, self.r_max, self.v_min, self.v_max, self.r_min, self.r_min
+            )
+        except RuntimeError:
+            self.minmax_update = minmax_update
+
+    def update(self, reward: torch.Tensor, value: torch.Tensor):
+        self.r_min, self.r_max, self.v_min, self.v_max, self.penalty = (
+            self.minmax_update(
+                self.r_min, self.r_max, self.v_min, self.v_max, reward, value
+            )
+        )
 
 
 def minmax_update(
