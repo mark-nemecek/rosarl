@@ -13,6 +13,7 @@ def load_config(config_path: str):
     args = None
     with open(config_path, encoding="utf-8") as file:
         try:
+            print(f'Loading {config_path}')
             args = yaml.load(file, Loader=yaml.FullLoader)  # noqa: S506
             assert args is not None, "load file error"
         except yaml.YAMLError as exc:
