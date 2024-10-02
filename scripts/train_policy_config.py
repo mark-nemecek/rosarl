@@ -61,6 +61,13 @@ if __name__ == "__main__":
         help="device to use for training",
     )
     parser.add_argument(
+        "--vector-env-nums",
+        type=int,
+        default=1,
+        metavar="VECTOR-ENV",
+        help="number of vector envs to use for training",
+    )
+    parser.add_argument(
         "--torch-threads",
         type=int,
         default=16,

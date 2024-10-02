@@ -45,12 +45,22 @@ def patch_OnPolicyAdapter():
         info: dict[str, Any],
     ) -> None:
         original__log_value(self, reward, cost, info)
-        success = (
-            info["final_info"].get("success", False)
-            if "final_info" in info
-            else info.get("success", False)
-        )
-        self._ep_success += success
+
+        if "success" in info:
+            success = torch.as_tensor(info["success"], device=self._device)
+        elif "final_info" in info:
+            final_info = info["final_info"]
+            if isinstance(final_info, dict) and "success" in final_info:
+                success = final_info["success"]
+                success = torch.as_tensor(success, device=self._device)
+            elif "success" in info["final_info"][0]:
+                success = tuple(i["success"] for i in final_info)
+                success = torch.as_tensor(success, device=self._device)
+
+        if success is None:
+            success = torch.zeros_like(self._ep_success)
+
+        self._ep_success += torch.as_tensor(success, device=self._device)
         self._cumulative_cost += cost.sum()
 
     def _log_metrics(self, logger, idx: int) -> None:
