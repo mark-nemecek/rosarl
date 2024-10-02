@@ -15,6 +15,7 @@ def __combine(
     tasks: dict[str, dict],
     agents: tuple[str],
     max_episode_steps: int,
+    unsafe_terminal: bool = True,
     goal_terminal: bool = False,
 ):
     """Combine tasks and agents together to register environment tasks."""
@@ -28,7 +29,7 @@ def __combine(
             wrapper = WrapperSpec(
                 "TerminalUnsafeWrapper",
                 "rosarl.envs.wrappers:TerminalUnsafeWrapper",
-                {"goal_terminal": goal_terminal},
+                {"unsafe_terminal": unsafe_terminal, "goal_terminal": goal_terminal},
             )
 
             __register_helper(
@@ -93,3 +94,40 @@ __combine(PREFIX, circle_tasks, ROBOT_NAMES, max_episode_steps=500, goal_termina
 # ----------------------------------------
 run_tasks = {"Run0": {}}
 __combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=500, goal_terminal=True)
+
+
+# Add versions which do not terminate on unsafe or goal
+PREFIX = "Safetyterminalnone"
+
+# Button Environments
+# ----------------------------------------
+button_tasks = {"Button0": {}, "Button1": {}, "Button2": {}}
+__combine(
+    PREFIX, button_tasks, ROBOT_NAMES, max_episode_steps=1000, unsafe_terminal=False
+)
+
+# Push Environments
+# ----------------------------------------
+push_tasks = {"Push0": {}, "Push1": {}, "Push2": {}}
+__combine(
+    PREFIX, push_tasks, ROBOT_NAMES, max_episode_steps=1000, unsafe_terminal=False
+)
+
+# Goal Environments
+# ----------------------------------------
+goal_tasks = {"Goal0": {}, "Goal1": {}, "Goal2": {}}
+__combine(
+    PREFIX, goal_tasks, ROBOT_NAMES, max_episode_steps=1000, unsafe_terminal=False
+)
+
+# Circle Environments
+# ----------------------------------------
+circle_tasks = {"Circle0": {}, "Circle1": {}, "Circle2": {}}
+__combine(
+    PREFIX, circle_tasks, ROBOT_NAMES, max_episode_steps=500, unsafe_terminal=False
+)
+
+# Run Environments
+# ----------------------------------------
+run_tasks = {"Run0": {}}
+__combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=500, unsafe_terminal=False)

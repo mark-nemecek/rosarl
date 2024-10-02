@@ -4,8 +4,9 @@ from gymnasium import Wrapper
 
 
 class TerminalUnsafeWrapper(Wrapper):
-    def __init__(self, env, goal_terminal):
+    def __init__(self, env, unsafe_terminal, goal_terminal):
         super().__init__(env)
+        self.unsafe_terminal = unsafe_terminal
         self.goal_terminal = goal_terminal
         self.goal_has_been_met = False
     
@@ -27,7 +28,7 @@ class TerminalUnsafeWrapper(Wrapper):
             success = truncated and self.goal_has_been_met and not is_unsafe
         info["success"] = success
 
-        terminated = terminated or is_unsafe or (self.goal_terminal and goal_met)
-        reward = -1.0 if is_unsafe else reward
+        terminated = terminated or (self.unsafe_terminal and is_unsafe) or (self.goal_terminal and goal_met)
+        reward = -1.0 if (self.unsafe_terminal and is_unsafe) else reward
 
         return obs, reward, cost, terminated, truncated, info
