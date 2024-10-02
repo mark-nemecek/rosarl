@@ -32,4 +32,6 @@ data_processing/
 
 wandb
 scripts/runs
+scripts/runs_backup
 scripts/plotting
+scripts/zzz_job_logs
