@@ -3,33 +3,50 @@ from typing import Any, SupportsFloat
 from gymnasium import Wrapper
 
 
-class TerminalUnsafeWrapper(Wrapper):
-    def __init__(self, env, unsafe_terminal, goal_terminal):
+class RosarlWrapper(Wrapper):
+    """Wrapper which reports unsafe states and task success and also allows termination on reaching an unsafe state or a goal state."""
+
+    def __init__(self, env, unsafe_terminal: bool, goal_terminal: bool):
         super().__init__(env)
         self.unsafe_terminal = unsafe_terminal
         self.goal_terminal = goal_terminal
-        self.goal_has_been_met = False
+        self.goal_state_reached = False
+        self.unsafe_state_reached = False
 
     def reset(
         self, *, seed: int | None = None, options: dict[str, Any] | None = None
     ) -> tuple[Any, dict[str, Any]]:
-        self.goal_has_been_met = False
+        self.goal_state_reached = False
+        self.unsafe_state_reached = False
         return super().reset(seed=seed, options=options)
 
     def step(
         self, action: Any
-    ) -> tuple[Any, SupportsFloat, bool, bool, dict[str, Any]]:
+    ) -> tuple[Any, SupportsFloat, SupportsFloat, bool, bool, dict[str, Any]]:
         obs, reward, cost, terminated, truncated, info = super().step(action)
 
         is_unsafe = cost > 0.0
         info["unsafe"] = is_unsafe
+        self.unsafe_state_reached |= is_unsafe
+
         goal_met = info.get("goal_met", False)
-        self.goal_has_been_met |= goal_met
+        self.goal_state_reached |= goal_met
 
         if self.goal_terminal:
-            success = goal_met
+            if self.unsafe_terminal:
+                # terminal: goal and unsafe
+                success = goal_met and not is_unsafe
+            else:
+                # terminal: goal and not unsafe
+                success = goal_met and not self.unsafe_state_reached
+        elif self.unsafe_terminal:
+            # terminal: not goal and unsafe
+            success = truncated and self.goal_state_reached
         else:
-            success = truncated and self.goal_has_been_met and not is_unsafe
+            # terminal: not goal and not unsafe
+            success = (
+                truncated and self.goal_state_reached and not self.unsafe_state_reached
+            )
         info["success"] = success
 
         terminated = (

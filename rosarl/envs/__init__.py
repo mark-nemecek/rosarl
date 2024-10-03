@@ -27,8 +27,8 @@ def __combine(
             combined_config.update({"agent_name": robot_name})
 
             wrapper = WrapperSpec(
-                "TerminalUnsafeWrapper",
-                "rosarl.envs.wrappers:TerminalUnsafeWrapper",
+                "RosarlWrapper",
+                "rosarl.envs.wrappers:RosarlWrapper",
                 {"unsafe_terminal": unsafe_terminal, "goal_terminal": goal_terminal},
             )
 
