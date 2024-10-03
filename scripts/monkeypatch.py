@@ -46,6 +46,7 @@ def patch_OnPolicyAdapter():
     ) -> None:
         original__log_value(self, reward, cost, info)
 
+        success = None
         if "success" in info:
             success = torch.as_tensor(info["success"], device=self._device)
         elif "final_info" in info:
