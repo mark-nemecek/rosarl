@@ -3,7 +3,8 @@ import copy
 from gymnasium.envs.registration import WrapperSpec
 from safety_gymnasium import __register_helper, register
 
-from rosarl.envs.omnisafe_env import SafetyterminalGymnasiumEnv
+import rosarl.envs.omnisafe_env
+import rosarl.tasks
 
 PREFIX = "Safetyterminal"
 VERSION = "v0"
@@ -66,6 +67,11 @@ __combine(PREFIX, circle_tasks, ROBOT_NAMES, max_episode_steps=500)
 run_tasks = {"Run0": {}}
 __combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=500)
 
+# Pillar Environments
+# ----------------------------------------
+run_tasks = {"Pillar0": {}, "Pillar1": {}, "Pillar2": {}, "Pillar3": {}, "Pillar4": {}}
+__combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=1000)
+
 
 # Add versions which terminate on unsafe or goal
 PREFIX = "Safetyterminalgoal"
@@ -94,6 +100,11 @@ __combine(PREFIX, circle_tasks, ROBOT_NAMES, max_episode_steps=500, goal_termina
 # ----------------------------------------
 run_tasks = {"Run0": {}}
 __combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=500, goal_terminal=True)
+
+# Pillar Environments
+# ----------------------------------------
+run_tasks = {"Pillar0": {}, "Pillar1": {}, "Pillar2": {}, "Pillar3": {}, "Pillar4": {}}
+__combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=1000, goal_terminal=True)
 
 
 # Add versions which do not terminate on unsafe or goal
@@ -131,3 +142,8 @@ __combine(
 # ----------------------------------------
 run_tasks = {"Run0": {}}
 __combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=500, unsafe_terminal=False)
+
+# Pillar Environments
+# ----------------------------------------
+run_tasks = {"Pillar0": {}, "Pillar1": {}, "Pillar2": {}, "Pillar3": {}, "Pillar4": {}}
+__combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=1000, unsafe_terminal=False)
