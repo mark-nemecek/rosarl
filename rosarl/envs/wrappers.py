@@ -35,6 +35,18 @@ class RosarlWrapper(Wrapper):
         goal_met = info.get("goal_met", False)
         self.goal_state_reached |= goal_met
 
+        info["success"] = self.is_success(truncated, is_unsafe, goal_met)
+
+        terminated = (
+            terminated
+            or (self.unsafe_terminal and is_unsafe)
+            or (self.goal_terminal and goal_met)
+        )
+        reward = -1.0 if (self.unsafe_terminal and is_unsafe) else reward
+
+        return obs, reward, cost, terminated, truncated, info
+
+    def is_success(self, truncated, is_unsafe, goal_met):
         if self.goal_terminal:
             if self.unsafe_terminal:
                 # terminal: goal and unsafe
@@ -50,13 +62,5 @@ class RosarlWrapper(Wrapper):
             success = (
                 truncated and self.goal_state_reached and not self.unsafe_state_reached
             )
-        info["success"] = success
 
-        terminated = (
-            terminated
-            or (self.unsafe_terminal and is_unsafe)
-            or (self.goal_terminal and goal_met)
-        )
-        reward = -1.0 if (self.unsafe_terminal and is_unsafe) else reward
-
-        return obs, reward, cost, terminated, truncated, info
+        return success
