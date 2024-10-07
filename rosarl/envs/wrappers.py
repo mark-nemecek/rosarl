@@ -13,6 +13,9 @@ class RosarlWrapper(Wrapper):
         self.goal_state_reached = False
         self.unsafe_state_reached = False
 
+        if self.goal_terminal:
+            self.env.task.mechanism_conf.continue_goal = False
+
     def reset(
         self, *, seed: int | None = None, options: dict[str, Any] | None = None
     ) -> tuple[Any, dict[str, Any]]:
