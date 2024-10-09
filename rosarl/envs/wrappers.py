@@ -32,7 +32,7 @@ class RosarlWrapper(Wrapper):
         info["unsafe"] = is_unsafe
         self.unsafe_state_reached |= is_unsafe
 
-        goal_met = info.get("goal_met", False)
+        goal_met = info.setdefault("goal_met", False)
         self.goal_state_reached |= goal_met
 
         info["success"] = self.is_success(truncated, is_unsafe, goal_met)

@@ -20,6 +20,10 @@ def patch_PolicyGradient():
             "Metrics/CumulativeCost",
             window_length=1,
         )
+        self._logger.register_key(
+            "Metrics/EpGoalsMet",
+            window_length=self._cfgs.logger_cfgs.window_lens,
+        )
 
     PolicyGradient._init_log = _init_log
 
@@ -54,7 +58,14 @@ def patch_OnPolicyAdapter():
         else:
             success = torch.as_tensor(success, device=self._device)
 
+        goal_met = extract_data_from_info(info, "goal_met")
+        if goal_met is None:
+            goal_met = torch.zeros_like(self._ep_goals_met)
+        else:
+            goal_met = torch.as_tensor(goal_met, device=self._device)
+
         self._ep_success += torch.as_tensor(success, device=self._device)
+        self._ep_goals_met += torch.as_tensor(goal_met, device=self._device)
         self._cumulative_cost += cost.sum()
 
     def _log_metrics(self, logger, idx: int) -> None:
@@ -62,6 +73,7 @@ def patch_OnPolicyAdapter():
         logger.store(
             {
                 "Metrics/EpSuccess": self._ep_success[idx],
+                "Metrics/EpGoalsMet": self._ep_goals_met[idx],
                 "Metrics/CumulativeCost": self._cumulative_cost,
             }
         )
@@ -70,8 +82,10 @@ def patch_OnPolicyAdapter():
         original__reset_log(self, idx)
         if idx is None:
             self._ep_success = torch.zeros(self._env.num_envs, device=self._device)
+            self._ep_goals_met = torch.zeros(self._env.num_envs, device=self._device)
         else:
             self._ep_success[idx] = 0
+            self._ep_goals_met[idx] = 0
 
     OnPolicyAdapter.__init__ = __init__
     OnPolicyAdapter._log_value = _log_value
