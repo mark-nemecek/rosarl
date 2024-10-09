@@ -1,1 +1,2 @@
 from rosarl.adapter.minmax_adapter import MinmaxAdapter
+from rosarl.adapter.minmax_batch_adapter import MinmaxBatchAdapter

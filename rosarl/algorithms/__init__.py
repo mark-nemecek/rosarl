@@ -2,13 +2,14 @@ from types import MappingProxyType
 
 import omnisafe
 
-from rosarl.algorithms.ppo_minmax import PPOMinmax
-from rosarl.algorithms.trpo_minmax import TRPOMinmax
+from rosarl.algorithms.ppo_minmax import PPOMinmax, PPOMinmaxBatch
+from rosarl.algorithms.trpo_minmax import TRPOMinmax, TRPOMinmaxBatch
 
 ALGORITHMS = {
-    "all": tuple(a for a in omnisafe.ALGORITHMS["all"]) + ("TRPOMinmax", "PPOMinmax"),
+    "all": tuple(a for a in omnisafe.ALGORITHMS["all"])
+    + ("TRPOMinmax", "PPOMinmax", "TRPOMinmaxBatch", "PPOMinmaxBatch"),
     "on-policy": tuple(a for a in omnisafe.ALGORITHMS["on-policy"])
-    + ("TRPOMinmax", "PPOMinmax"),
+    + ("TRPOMinmax", "PPOMinmax", "TRPOMinmaxBatch", "PPOMinmaxBatch"),
     "off-policy": omnisafe.ALGORITHMS["off-policy"],
     "model-based": omnisafe.ALGORITHMS["model-based"],
     "offline": omnisafe.ALGORITHMS["offline"],
