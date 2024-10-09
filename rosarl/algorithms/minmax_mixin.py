@@ -27,11 +27,14 @@ class MinmaxMixin:
             AssertionError: If the number of steps per epoch is not divisible by the number of
                 environments.
         """
+        self._minmax_penalty = MinmaxPenalty(device=self._device)
+
         self._env: MinmaxAdapter = MinmaxAdapter(
             self._env_id,
             self._cfgs.train_cfgs.vector_env_nums,
             self._seed,
             self._cfgs,
+            self._minmax_penalty,
         )
         assert (self._cfgs.algo_cfgs.steps_per_epoch) % (
             distributed.world_size() * self._cfgs.train_cfgs.vector_env_nums
@@ -41,3 +44,13 @@ class MinmaxMixin:
             // distributed.world_size()
             // self._cfgs.train_cfgs.vector_env_nums
         )
+
+    def _update(self) -> None:
+        super()._update()
+
+        self._logger.store(
+            {
+                "Misc/MinmaxPenalty": self._minmax_penalty.penalty,
+            },
+        )
+
