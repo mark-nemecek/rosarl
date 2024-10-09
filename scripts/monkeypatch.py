@@ -4,6 +4,8 @@ import torch
 from omnisafe.adapter import OnPolicyAdapter
 from omnisafe.algorithms import PolicyGradient
 
+from rosarl.utils.info_data import extract_data_from_info
+
 
 def patch_PolicyGradient():
     original__init_log = PolicyGradient._init_log
@@ -46,20 +48,11 @@ def patch_OnPolicyAdapter():
     ) -> None:
         original__log_value(self, reward, cost, info)
 
-        success = None
-        if "success" in info:
-            success = torch.as_tensor(info["success"], device=self._device)
-        elif "final_info" in info:
-            final_info = info["final_info"]
-            if isinstance(final_info, dict) and "success" in final_info:
-                success = final_info["success"]
-                success = torch.as_tensor(success, device=self._device)
-            elif "success" in info["final_info"][0]:
-                success = tuple(i["success"] for i in final_info)
-                success = torch.as_tensor(success, device=self._device)
-
+        success = extract_data_from_info(info, "success")
         if success is None:
             success = torch.zeros_like(self._ep_success)
+        else:
+            success = torch.as_tensor(success, device=self._device)
 
         self._ep_success += torch.as_tensor(success, device=self._device)
         self._cumulative_cost += cost.sum()

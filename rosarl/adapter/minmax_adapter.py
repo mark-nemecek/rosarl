@@ -10,6 +10,8 @@ from omnisafe.models.actor_critic.constraint_actor_critic import ConstraintActor
 from omnisafe.utils.config import Config
 from rich.progress import track
 
+from rosarl.utils.info_data import extract_data_from_info
+
 
 class MinmaxAdapter(OnPolicyAdapter):
     """Adapter for Minmax algo for OmniSafe.
@@ -127,20 +129,11 @@ class MinmaxAdapter(OnPolicyAdapter):
     ):
         self._minmax_penalty.update(reward, value_r)
 
-        unsafe = None
-        if "unsafe" in info:
-            unsafe = torch.as_tensor(info["unsafe"], device=self._device)
-        elif "final_info" in info:
-            final_info = info["final_info"]
-            if isinstance(final_info, dict) and "unsafe" in final_info:
-                unsafe = final_info["unsafe"]
-                unsafe = torch.as_tensor(unsafe, device=self._device)
-            elif "unsafe" in info["final_info"][0]:
-                unsafe = tuple(i["unsafe"] for i in final_info)
-                unsafe = torch.as_tensor(unsafe, device=self._device)
-
+        unsafe = extract_data_from_info(info, "unsafe")
         if unsafe is None:
             unsafe = torch.zeros_like(reward, dtype=torch.bool)
+        else:
+            unsafe = torch.as_tensor(unsafe, device=self._device)
 
         if torch.any(unsafe):
             reward = torch.where(unsafe, self._minmax_penalty.penalty, reward)
