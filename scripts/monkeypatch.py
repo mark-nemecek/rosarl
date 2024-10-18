@@ -1,13 +1,17 @@
 from typing import Any
 
+import numpy as np
 import torch
 from omnisafe.adapter import OnPolicyAdapter
 from omnisafe.algorithms import PolicyGradient
+from safety_gymnasium.bases.base_agent import BaseAgent
 
 from rosarl.utils.info_data import extract_data_from_info
 
 
 def patch_PolicyGradient():
+    """Register more metrics."""
+
     original__init_log = PolicyGradient._init_log
 
     def _init_log(self) -> None:
@@ -29,6 +33,8 @@ def patch_PolicyGradient():
 
 
 def patch_OnPolicyAdapter():
+    """Track more metrics."""
+
     original___init__ = OnPolicyAdapter.__init__
     original__log_value = OnPolicyAdapter._log_value
     original__log_metrics = OnPolicyAdapter._log_metrics
@@ -93,6 +99,36 @@ def patch_OnPolicyAdapter():
     OnPolicyAdapter._reset_log = _reset_log
 
 
+def patch_BaseAgent():
+    """Fix bug with noise for actions with more than one dimension."""
+
+    original_apply_action = BaseAgent.apply_action
+
+    def apply_action(self, action: np.ndarray, noise: np.ndarray | None = None) -> None:
+        """Apply an action to the agent.
+
+        Just fill up the control array in the engine data.
+
+        Args:
+            action (np.ndarray): The action to apply.
+            noise (np.ndarray): The noise to add to the action.
+        """
+        action = np.array(action, copy=False)  # Cast to ndarray
+
+        # Set action
+        action_range = self.engine.model.actuator_ctrlrange
+
+        self.engine.data.ctrl[:] = np.clip(
+            action, action_range[:, 0], action_range[:, 1]
+        )
+
+        if noise is not None:
+            self.engine.data.ctrl[:] += noise
+
+    BaseAgent.apply_action = apply_action
+
+
 def monkeypatch():
     patch_PolicyGradient()
     patch_OnPolicyAdapter()
+    patch_BaseAgent()
