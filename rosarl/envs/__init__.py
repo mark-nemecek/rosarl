@@ -69,7 +69,15 @@ __combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=500)
 
 # Pillar Environments
 # ----------------------------------------
-run_tasks = {"Pillar0": {}, "Pillar1": {}, "Pillar2": {}, "Pillar3": {}, "Pillar4": {}}
+run_tasks = {
+    "Pillar0": {},
+    "Pillar1": {},
+    "Pillar2": {},
+    "Pillar3": {},
+    "Pillar4": {},
+    "Pillar5": {},
+    "Pillar6": {},
+}
 __combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=1000)
 
 
@@ -103,7 +111,15 @@ __combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=500, goal_terminal=T
 
 # Pillar Environments
 # ----------------------------------------
-run_tasks = {"Pillar0": {}, "Pillar1": {}, "Pillar2": {}, "Pillar3": {}, "Pillar4": {}}
+run_tasks = {
+    "Pillar0": {},
+    "Pillar1": {},
+    "Pillar2": {},
+    "Pillar3": {},
+    "Pillar4": {},
+    "Pillar5": {},
+    "Pillar6": {},
+}
 __combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=1000, goal_terminal=True)
 
 
@@ -145,5 +161,13 @@ __combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=500, unsafe_terminal
 
 # Pillar Environments
 # ----------------------------------------
-run_tasks = {"Pillar0": {}, "Pillar1": {}, "Pillar2": {}, "Pillar3": {}, "Pillar4": {}}
+run_tasks = {
+    "Pillar0": {},
+    "Pillar1": {},
+    "Pillar2": {},
+    "Pillar3": {},
+    "Pillar4": {},
+    "Pillar5": {},
+    "Pillar6": {},
+}
 __combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=1000, unsafe_terminal=False)

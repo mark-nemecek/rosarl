@@ -46,7 +46,7 @@ class RosarlWrapper(Wrapper):
 
         return obs, reward, cost, terminated, truncated, info
 
-    def is_success(self, truncated, is_unsafe, goal_met):
+    def is_success(self, truncated: bool, is_unsafe: bool, goal_met: bool) -> bool:
         if self.goal_terminal:
             if self.unsafe_terminal:
                 # terminal: goal and unsafe
