@@ -77,6 +77,8 @@ run_tasks = {
     "Pillar4": {},
     "Pillar5": {},
     "Pillar6": {},
+    "Pillar7": {},
+    "Pillar8": {},
 }
 __combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=1000)
 
@@ -119,6 +121,8 @@ run_tasks = {
     "Pillar4": {},
     "Pillar5": {},
     "Pillar6": {},
+    "Pillar7": {},
+    "Pillar8": {},
 }
 __combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=1000, goal_terminal=True)
 
@@ -169,5 +173,7 @@ run_tasks = {
     "Pillar4": {},
     "Pillar5": {},
     "Pillar6": {},
+    "Pillar7": {},
+    "Pillar8": {},
 }
 __combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=1000, unsafe_terminal=False)

@@ -90,3 +90,15 @@ class PillarLevel6(PillarBase):
     def __init__(self, config) -> None:
         super().__init__(config)
         self.action_noise = 1.0
+
+
+class PillarLevel7(PillarBase):
+    def __init__(self, config) -> None:
+        super().__init__(config)
+        self.action_noise = 1.5
+
+
+class PillarLevel8(PillarBase):
+    def __init__(self, config) -> None:
+        super().__init__(config)
+        self.action_noise = 2.0
