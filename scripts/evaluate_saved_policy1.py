@@ -151,12 +151,15 @@ if __name__ == "__main__":
             model_file = os.path.join(root, "torch_save", "epoch-333.pt")
             if not os.path.isfile(model_file):
                 continue
-            
+
             log_dir = root
             with open(config_file, "r") as cf:
                 config = json.load(cf)
             algo = config["algo"]
             env_id = config["env_id"]
+
+            if not config["algo_cfgs"]["obs_normalize"]:
+                continue
 
             if algo not in algo_list:
                 continue
