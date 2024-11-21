@@ -17,6 +17,8 @@
 from collections import defaultdict
 import json
 import os
+import pickle
+import time
 
 import numpy as np
 
@@ -43,7 +45,7 @@ noise_level_lookup = {
 }
 
 
-def generate_latex_table(data, algo_list, noise_order):
+def generate_latex_table(data, algo_list, noise_order, bold_best):
     # Group data by noise level
     grouped_data = defaultdict(list)
     for row in data:
@@ -102,15 +104,16 @@ def generate_latex_table(data, algo_list, noise_order):
             returns = f"{row[5]:.2f} $\\pm$ {row[6]:.2f}"
             total_steps = f"{row[7]:.2f} $\\pm$ {row[8]:.2f}"
 
-            # Bold the highest/lowest values as required
-            if row[1] == min_cost:
-                costs = f"\\textbf{{{costs}}}"
-            if row[3] == max_success:
-                success = f"\\textbf{{{success}}}"
-            if row[5] == max_returns:
-                returns = f"\\textbf{{{returns}}}"
-            if row[7] == min_steps:
-                total_steps = f"\\textbf{{{total_steps}}}"
+            if bold_best:
+                # Bold the highest/lowest values as required
+                if row[1] == min_cost:
+                    costs = f"\\textbf{{{costs}}}"
+                if row[3] == max_success:
+                    success = f"\\textbf{{{success}}}"
+                if row[5] == max_returns:
+                    returns = f"\\textbf{{{returns}}}"
+                if row[7] == min_steps:
+                    total_steps = f"\\textbf{{{total_steps}}}"
 
             # Format the noise level only in the first row of each group
             if first_row:
@@ -134,12 +137,16 @@ def generate_latex_table(data, algo_list, noise_order):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('log_dir', type=str)
+    parser.add_argument("log_dir", type=str)
+    parser.add_argument("--algo-list", type=str, default="TRPOMinmax,TRPOLag,TRPOSaute,TRPO,CPO,P3O", help="comma-separated list of algo names")
+    parser.add_argument("--obsnorm", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--bold", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--save", action=argparse.BooleanOptionalAction, default=False)
     args = parser.parse_args()
 
     LOG_DIR = args.log_dir
 
-    algo_list = ["TRPOMinmax", "TRPOLag", "TRPOSaute", "TRPO", "CPO", "P3O"]
+    algo_list = args.algo_list.split(",")
     # noise_list = [0.0, 1.5, 2.5]
 
     evaluator = Evaluator(render_mode="rgb_array")
@@ -158,7 +165,7 @@ if __name__ == "__main__":
             algo = config["algo"]
             env_id = config["env_id"]
 
-            if not config["algo_cfgs"]["obs_normalize"]:
+            if args.obsnorm != config["algo_cfgs"]["obs_normalize"]:
                 continue
 
             if algo not in algo_list:
@@ -225,5 +232,11 @@ if __name__ == "__main__":
                 algo_data = env_data[algo]
                 sorted_results.append(algo_data)
 
-    latex_table = generate_latex_table(sorted_results, algo_list, ["X"])
+    latex_table = generate_latex_table(sorted_results, algo_list, ["X"], args.bold)
     print("\n", latex_table)
+
+    if args.save:
+        dt = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime())
+        file_path = f"{args.log_dir}/evaluations_{args.algo_list}_obsnorm-{args.obsnorm}_{dt}.pkl"
+        with open(file_path, "wb") as handle:
+            pickle.dump(sorted_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
