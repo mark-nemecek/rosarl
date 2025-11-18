@@ -177,3 +177,57 @@ run_tasks = {
     "Pillar8": {},
 }
 __combine(PREFIX, run_tasks, ROBOT_NAMES, max_episode_steps=1000, unsafe_terminal=False)
+
+
+# Humanoid Environment
+wrapper = WrapperSpec(
+    "RosarlWrapper",
+    "rosarl.envs.wrappers:RosarlWrapper",
+    {"unsafe_terminal": True, "goal_terminal": False},
+)
+
+__register_helper(
+    env_id="SafetyterminalHalfCheetahVelocity-v1",
+    entry_point="safety_gymnasium.tasks.safe_velocity.safety_half_cheetah_velocity_v1:SafetyHalfCheetahVelocityEnv",
+    max_episode_steps=1000,
+    reward_threshold=4800.0,
+    additional_wrappers=[wrapper],
+)
+
+__register_helper(
+    env_id="SafetyterminalHopperVelocity-v1",
+    entry_point="safety_gymnasium.tasks.safe_velocity.safety_hopper_velocity_v1:SafetyHopperVelocityEnv",
+    max_episode_steps=1000,
+    reward_threshold=3800.0,
+    additional_wrappers=[wrapper],
+)
+
+__register_helper(
+    env_id="SafetyterminalSwimmerVelocity-v1",
+    entry_point="safety_gymnasium.tasks.safe_velocity.safety_swimmer_velocity_v1:SafetySwimmerVelocityEnv",
+    max_episode_steps=1000,
+    reward_threshold=360.0,
+    additional_wrappers=[wrapper],
+)
+
+__register_helper(
+    env_id="SafetyterminalWalker2dVelocity-v1",
+    entry_point="safety_gymnasium.tasks.safe_velocity.safety_walker2d_velocity_v1:SafetyWalker2dVelocityEnv",
+    max_episode_steps=1000,
+    additional_wrappers=[wrapper],
+)
+
+__register_helper(
+    env_id="SafetyterminalAntVelocity-v1",
+    entry_point="safety_gymnasium.tasks.safe_velocity.safety_ant_velocity_v1:SafetyAntVelocityEnv",
+    max_episode_steps=1000,
+    reward_threshold=6000.0,
+    additional_wrappers=[wrapper],
+)
+
+__register_helper(
+    env_id="SafetyterminalHumanoidVelocity-v1",
+    entry_point="safety_gymnasium.tasks.safe_velocity.safety_humanoid_velocity_v1:SafetyHumanoidVelocityEnv",
+    max_episode_steps=1000,
+    additional_wrappers=[wrapper],
+)
