@@ -155,8 +155,9 @@ if __name__ == "__main__":
     for root, dirs, files in os.walk(LOG_DIR, followlinks=True):
         if "config.json" in files:
             config_file = os.path.join(root, "config.json")
-            model_file = os.path.join(root, "torch_save", "epoch-333.pt")
-            if not os.path.isfile(model_file):
+            model_file = "epoch-333.pt"
+            model_path = os.path.join(root, "torch_save", model_file)
+            if not os.path.isfile(model_path):
                 continue
 
             log_dir = root

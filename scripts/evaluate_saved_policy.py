@@ -135,7 +135,8 @@ LOG_DIR = (
     "/home/mark/projects/rosarl/scripts/runs/cluster/pointpillar-goal-unsafe-terminal"
 )
 if __name__ == "__main__":
-    algo_list = ["TRPOMinmax", "TRPOLag", "TRPOSaute", "TRPO", "CPO", "P3O"]
+    # algo_list = ["TRPOMinmax", "TRPOLag", "TRPOSaute", "TRPO", "CPO", "P3O"]
+    algo_list = ["CPPOPID"]
     noise_list = [0.0, 1.5, 2.5]
 
     evaluator = Evaluator(render_mode="rgb_array")
