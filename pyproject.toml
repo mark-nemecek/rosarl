@@ -10,6 +10,7 @@ dependencies = [
     "omnisafe>=0.5.0",
     "torch>=2.4.1",
     "numpy==1.23.5",
+    "safety-gymnasium>=1.0.0",
 ]
 
 [project.optional-dependencies]
