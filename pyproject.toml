@@ -7,7 +7,7 @@ authors = [
     { name = "Mark Nemecek", email = "mark.nemecek@duke.edu" }
 ]
 dependencies = [
-    "omnisafe>=0.5.0",
+    "omnisafe@git+https://github.com/PKU-Alignment/omnisafe#egg=51818709f1bef340f1abc67ce3f6d096c75338c3",
     "torch>=2.4.1",
     "numpy==1.23.5",
     "safety-gymnasium>=1.0.0",
