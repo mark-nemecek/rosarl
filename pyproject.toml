@@ -26,6 +26,8 @@ cu128 = [
 dev = [
     "jupyter>=1.1.1",
     "pandas==2.0.3",
+    "isort",
+    "black",
 ]
 
 [tool.uv]
