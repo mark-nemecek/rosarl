@@ -1,6 +1,6 @@
 # Intro
 
-This repository contains the code to replicate the experiments of the paper "[An Unreasonably Simple Approach to Safe RL](https://rlj.cs.umass.edu/2026/papers/Paper96.html)". The paper introduces a new framework for safe RL where the agent learns safe policies solely from scalar rewards using any suitable RL algorithm. This is achieved by replacing the rewards at unsafe terminal states by the minmax penalty, which is the strict upperbound reward whose optimal policy minimises the probability of reaching unsafe states.
+This repository contains the code to replicate the experiments of the paper "[An Unreasonably Simple Approach to Safe RL](https://rlj.cs.umass.edu/2026/papers/Paper96.html)". The paper introduces a new framework for safe RL where the agent learns safe policies solely from scalar rewards using any suitable RL algorithm. This is achieved by replacing the rewards at unsafe terminal states by the Value-Range penalty, which is the strict upperbound reward whose optimal policy minimises the probability of reaching unsafe states.
 
 The code was written as an extension to the [OmniSafe](https://github.com/PKU-Alignment/omnisafe) and [SafetyGymnasium](https://github.com/PKU-Alignment/safety-gymnasium) libraries to add algos and environments.
 
