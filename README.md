@@ -4,7 +4,8 @@ This repository contains the code to replicate the experiments of the paper "[An
 
 The code was written as an extension to the [OmniSafe](https://github.com/PKU-Alignment/omnisafe) and [SafetyGymnasium](https://github.com/PKU-Alignment/safety-gymnasium) libraries to add algos and environments.
 
-<img width="4274" height="1080" alt="algorithms_trajectories" src="https://github.com/user-attachments/assets/7dc47ba6-fa38-4266-99a0-d677eb9dcb73" />
+<img width="4274" height="1080" alt="algorithms_trajectories" src="https://github.com/user-attachments/assets/f90756d8-3fb3-40c3-b223-e0c5fd3c4e50" />
+
 
 ## Supported RL Algorithms and General Usage
 
